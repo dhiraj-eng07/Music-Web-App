@@ -1,46 +1,37 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const { 
+  uploadTrack, 
+  getTracks, 
+  getTrack, 
+  likeTrack, 
+  getArtistTracks 
+} = require('../controllers/trackController');
+const { uploadTrack: uploadMiddleware } = require('../middleware/upload');
+const auth = require('../middleware/auth');
 
-const trackSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  artist: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  fileUrl: {
-    type: String,
-    required: true
-  },
-  coverArt: {
-    type: String,
-    default: ''
-  },
-  duration: {
-    type: Number,
-    default: 0
-  },
-  genre: {
-    type: String,
-    required: true
-  },
-  releaseDate: {
-    type: Date,
-    default: Date.now
-  },
-  plays: {
-    type: Number,
-    default: 0
-  },
-  likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }]
-}, {
-  timestamps: true
-});
+const router = express.Router();
 
-module.exports = mongoose.model('Track', trackSchema);
+// Upload track with error handling
+router.post('/upload', auth, (req, res, next) => {
+  uploadMiddleware.single('track')(req, res, function(err) {
+    if (err instanceof multer.MulterError) {
+      // A Multer error occurred when uploading
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'File too large' });
+      }
+      return res.status(400).json({ message: err.message });
+    } else if (err) {
+      // An unknown error occurred
+      return res.status(400).json({ message: err.message });
+    }
+    // Everything went fine
+    next();
+  });
+}, uploadTrack);
+
+router.get('/', getTracks);
+router.get('/:id', getTrack);
+router.post('/:id/like', auth, likeTrack);
+router.get('/artist/:artistId', getArtistTracks);
+
+module.exports = router;
