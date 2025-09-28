@@ -1,4 +1,32 @@
 // Auto-detect API base URL for Vercel
+
+// Auto-detect environment
+const isVercel = window.location.hostname.includes('vercel.app');
+const API_BASE = isVercel ? '/api' : '/api';
+
+console.log('🌐 Environment:', isVercel ? 'Vercel' : 'Local');
+console.log('🔗 API Base:', API_BASE);
+
+class Auth {
+    constructor() {
+        this.token = localStorage.getItem('token');
+        this.user = JSON.parse(localStorage.getItem('user') || 'null');
+        
+        this.testBackendConnection();
+    }
+
+    async testBackendConnection() {
+        try {
+            const response = await fetch(`${API_BASE}/test`);
+            const data = await response.json();
+            console.log('✅ Backend connection successful:', data);
+        } catch (error) {
+            console.error('❌ Backend connection failed:', error);
+        }
+    }
+
+    // ... rest of your Auth class remains the same
+}
 const API_BASE = window.location.hostname.includes('vercel.app') 
     ? '/api' 
     : '/api';
@@ -105,9 +133,11 @@ class Auth {
             'Content-Type': 'application/json',
         };
     }
+    
 }
 
 const auth = new Auth();
 
 // Rest of your auth.js code remains the same...
 // [Include the rest of your existing auth.js code here]
+
