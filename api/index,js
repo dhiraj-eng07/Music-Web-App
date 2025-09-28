@@ -1,0 +1,154 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+
+// CORS configuration
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Test route
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        message: '✅ Backend is working on Vercel!',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// In-memory storage for demo
+let users = [];
+let tracks = [];
+let nextId = 1;
+
+// Authentication routes
+app.post('/api/auth/register', (req, res) => {
+    try {
+        const { name, email, password, userType } = req.body;
+        
+        console.log('📝 Registration attempt:', { name, email, userType });
+        
+        if (!name || !email || !password || !userType) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+        
+        if (users.find(u => u.email === email)) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+        
+        const user = {
+            _id: `user_${nextId++}`,
+            name,
+            email,
+            userType,
+            createdAt: new Date()
+        };
+        
+        users.push(user);
+        const token = `token_${Date.now()}`;
+        
+        console.log('✅ User registered successfully:', user.email);
+        
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                userType: user.userType
+            }
+        });
+    } catch (error) {
+        console.error('❌ Registration error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.post('/api/auth/login', (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        console.log('🔐 Login attempt:', email);
+        
+        const user = users.find(u => u.email === email);
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+        
+        const token = `token_${Date.now()}`;
+        
+        console.log('✅ User logged in successfully:', user.email);
+        
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                userType: user.userType
+            }
+        });
+    } catch (error) {
+        console.error('❌ Login error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Mock tracks data
+app.get('/api/tracks', (req, res) => {
+    const sampleTracks = [
+        {
+            _id: '1',
+            name: 'Blinding Lights',
+            artist: { _id: 'artist1', name: 'The Weeknd' },
+            fileUrl: '#',
+            coverArt: '',
+            genre: 'pop',
+            likes: [],
+            plays: 0,
+            duration: 200
+        },
+        {
+            _id: '2',
+            name: 'Save Your Tears',
+            artist: { _id: 'artist1', name: 'The Weeknd' },
+            fileUrl: '#',
+            coverArt: '',
+            genre: 'pop',
+            likes: [],
+            plays: 0,
+            duration: 215
+        },
+        {
+            _id: '3',
+            name: 'Levitating',
+            artist: { _id: 'artist2', name: 'Dua Lipa' },
+            fileUrl: '#',
+            coverArt: '',
+            genre: 'pop',
+            likes: [],
+            plays: 0,
+            duration: 203
+        }
+    ];
+    
+    res.json(sampleTracks);
+});
+
+// Serve frontend for all other routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// Export for Vercel
+module.exports = app;
