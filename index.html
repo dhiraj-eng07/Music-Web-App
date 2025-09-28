@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melodify - Music Streaming</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Authentication Screen -->
+    <div id="auth-screen" class="auth-container">
+        <div class="auth-form">
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <h1>Melodify</h1>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="login-tab">Log In</div>
+                <div class="auth-tab" id="signup-tab">Sign Up</div>
+            </div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email address</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-block">Log In</button>
+            </form>
+            
+            <form id="signup-form" class="hidden">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email address</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-type">I am a</label>
+                    <select id="user-type" required>
+                        <option value="">Select user type</option>
+                        <option value="listener">Listener</option>
+                        <option value="artist">Artist</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-block">Sign Up</button>
+            </form>
+
+            <div id="auth-message" class="message hidden"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app-container hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <h1>Melodify</h1>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-item active" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" data-page="search">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </div>
+                <div class="nav-item" data-page="library">
+                    <i class="fas fa-book"></i>
+                    <span>Your Library</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Playlists</h3>
+                <div class="nav-item" data-page="create-playlist">
+                    <i class="fas fa-plus-square"></i>
+                    <span>Create Playlist</span>
+                </div>
+                <div class="nav-item" data-page="liked-songs">
+                    <i class="fas fa-heart"></i>
+                    <span>Liked Songs</span>
+                </div>
+            </div>
+            
+            <div class="nav-section" id="user-playlists">
+                <h3>Your Playlists</h3>
+                <!-- Playlists will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="navigation-buttons">
+                    <button class="control-btn" id="back-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="control-btn" id="forward-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="user-menu">
+                    <button class="btn" id="upload-btn">
+                        <i class="fas fa-upload"></i> Upload Track
+                    </button>
+                    <div class="user-avatar" id="user-menu">
+                        <i class="fas fa-user-circle"></i>
+                        <div class="dropdown-menu hidden">
+                            <div class="dropdown-item" id="profile-btn">Profile</div>
+                            <div class="dropdown-item" id="logout-btn">Logout</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-area" id="content-area">
+                <!-- Content will be dynamically loaded here -->
+            </div>
+        </div>
+        
+        <!-- Player -->
+        <div class="player">
+            <div class="now-playing">
+                <div class="now-playing-img" id="now-playing-img">
+                    <i class="fas fa-music"></i>
+                </div>
+                <div class="track-info">
+                    <div class="track-name" id="now-playing-name">No track selected</div>
+                    <div class="track-artist" id="now-playing-artist">-</div>
+                </div>
+                <button class="option-btn" id="like-btn">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+            
+            <div class="player-controls">
+                <div class="control-buttons">
+                    <button class="control-btn" id="shuffle-btn">
+                        <i class="fas fa-random"></i>
+                    </button>
+                    <button class="control-btn" id="prev-btn">
+                        <i class="fas fa-step-backward"></i>
+                    </button>
+                    <button class="control-btn play-pause" id="play-pause-btn">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="control-btn" id="next-btn">
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+                    <button class="control-btn" id="repeat-btn">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-time" id="current-time">0:00</div>
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <div class="progress-time" id="duration">0:00</div>
+                </div>
+            </div>
+            
+            <div class="player-options">
+                <button class="option-btn" id="queue-btn">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="option-btn" id="device-btn">
+                    <i class="fas fa-desktop"></i>
+                </button>
+                <button class="option-btn" id="volume-btn">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <div class="progress-bar" id="volume-bar">
+                    <div class="progress" id="volume-progress"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div class="mobile-nav">
+            <div class="mobile-nav-items">
+                <a href="#" class="mobile-nav-item active" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="mobile-nav-item" data-page="search">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </a>
+                <a href="#" class="mobile-nav-item" data-page="library">
+                    <i class="fas fa-book"></i>
+                    <span>Library</span>
+                </a>
+                <a href="#" class="mobile-nav-item" data-page="liked-songs">
+                    <i class="fas fa-heart"></i>
+                    <span>Liked</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="audio-player" preload="metadata"></audio>
+
+    <script src="js/auth.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/app.js"></script>
+    
+</body>
+</html>
